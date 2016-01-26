@@ -13,11 +13,11 @@ syntax.py is copied from Mack Stone's [cmdReporterHighlighter.py](https://github
 
 Current Status
 ------------------
-prototype1 加了高亮显示和regex filter
+prototype2 01/28/2016 加了高亮显示和regex filter
 ![prototype2](http://i.imgur.com/fe27kl5.gif)
 
 
-prototype1 底部的QTextEdit加了滚轮缩放
+prototype1 01/25/2016 底部的QTextEdit加了滚轮缩放
 ![prototype1](http://i.imgur.com/OgD27N6.gif)
 
 
