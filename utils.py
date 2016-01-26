@@ -1,21 +1,33 @@
 
-
-import requests
-
-from bs4 import BeautifulSoup
+import constants
 
 
-url = 'http://help.autodesk.com/cloudhelp/2015/ENU/Maya-Tech-Docs/CommandsPython/index_all.html'
+def get_commands(web=False, version=2015):
+    if web:
 
-def get_commands():
-	r = requests.get(url)
+        import requests
 
-	soup = BeautifulSoup(r.text, 'html.parser')
-	commands=[]
-	for a in soup.select("td a"):
-		commands.append(a.text)
+        from bs4 import BeautifulSoup
 
-	return commands
+        url = 'http://help.autodesk.com/cloudhelp/2015/ENU/Maya-Tech-Docs/CommandsPython/index_all.html'
+        r = requests.get(url)
+
+        soup = BeautifulSoup(r.text, 'html.parser')
+        commands = []
+        for a in soup.select("td a"):
+            commands.append(a.text)
+
+    else:
+        commands = constants.maya_commands[version]
+
+    return commands
 
 
-print get_commands()
+def get_maya_version():
+    version = 2015
+    try:
+        import maya.cmds as mc
+        version = int(mc.about(v=1))
+    except:
+        pass
+    return version

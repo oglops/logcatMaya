@@ -9,7 +9,7 @@ from PyQt4.QtCore import QObject, pyqtSignal
 import logging
 
 sys.path.insert(0,'/home/oglop/github/logcatMaya')
-# import syntax
+import syntax
 
 __VERSION__ = '0.01'
 
@@ -291,7 +291,7 @@ class LogCat(QDialog):
         self.id = mo.MCommandMessage.addCommandOutputCallback(
             self.callback, None)
 
-        # self.highlight=syntax.MelHighlighter(self.textedit.edit.document())
+        self.highlight=syntax.Highlighter(self.textedit.edit.document())
 
     def callback(self, nativeMsg, messageType, data):
         # print nativeMsg, messageType, data
