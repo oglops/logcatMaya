@@ -31,3 +31,7 @@ def get_maya_version():
     except:
         pass
     return version
+
+def highlight_script_editor_output():
+	import syntax
+	syntax.highlightCmdReporter()

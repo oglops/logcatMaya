@@ -7,8 +7,9 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import QObject, pyqtSignal
 
 import logging
+import re
 
-sys.path.insert(0,'/home/oglop/github/logcatMaya')
+sys.path.insert(0, '/home/oglop/github/logcatMaya')
 import syntax
 
 __VERSION__ = '0.01'
@@ -32,7 +33,8 @@ from PyQt4.Qt import QWidget
 from PyQt4.Qt import Qt
 
 
-f=open('/tmp/logcat.log','a')
+f = open('/tmp/logcat.log', 'a')
+
 
 class LNTextEdit(QFrame):
 
@@ -66,6 +68,7 @@ class LNTextEdit(QFrame):
 
     class PlainTextEdit(QTextEdit):
         zoomed = pyqtSignal(int)
+
         def __init__(self, *args):
             QPlainTextEdit.__init__(self, *args)
 
@@ -161,17 +164,15 @@ class LNTextEdit(QFrame):
                 block_bounding_rect = self.blockBoundingGeometry(
                     block).translated(self.contentOffset())
 
-                block_top= block_bounding_rect.top()
+                block_top = block_bounding_rect.top()
                 # block_top_middle=block_top + font_metrics.height()/2
 
-                
                 # f.write('line_count: %s , %s' % (line_count,block_top))
                 # Check if the position of the block is out side of the visible
                 # area.
                 if not block.isVisible() or block_top >= event.rect().bottom():
                     break
                     # pass
-
 
                 # We want the line number for the selected line to be bold.
                 if line_count == current_line:
@@ -184,20 +185,20 @@ class LNTextEdit(QFrame):
                     font.setBold(False)
                     # font.setPointSize(font.pointSize() * 2)
 
-                # print 'painter font size',font.pointSize(), '--->',font.pointSize()*2
-                edit_font_size=self.font().pointSize()
-                if edit_font_size>0:
+                # print 'painter font size',font.pointSize(),
+                # '--->',font.pointSize()*2
+                edit_font_size = self.font().pointSize()
+                if edit_font_size > 0:
                     font.setPointSize(edit_font_size)
 
                 painter.setFont(font)
-
 
                 # font.setPointSize(20)
 
                 # Draw the line number right justified at the position of the
                 # line.
                 paint_rect = QRect(
-                    0, block_top, number_bar.width(),  font_metrics.height()) #  edit_font.pixelSize())
+                    0, block_top, number_bar.width(),  font_metrics.height())  # edit_font.pixelSize())
                 painter.drawText(
                     paint_rect, Qt.AlignRight, unicode(line_count))
 
@@ -225,18 +226,28 @@ class LNTextEdit(QFrame):
         # self.edit.textChanged.connect(self.number_bar.updateContents)
         self.edit.zoomed.connect(self.update_numbar_zoom)
 
-    def update_numbar_zoom(self,zoom):
+    def update_numbar_zoom(self, zoom):
         new_zoom = self.number_bar.font().pointSize() + zoom
-        # print 'number bar font size',self.number_bar.font().pointSize(), '--->', new_zoom
-        if new_zoom>0:
-            self.number_bar.font().setPointSize(new_zoom) 
+        # print 'number bar font size',self.number_bar.font().pointSize(),
+        # '--->', new_zoom
+        if new_zoom > 0:
+            self.number_bar.font().setPointSize(new_zoom)
         # self.number_bar.font().setPixelSize(10)
-        # print 'number bar font size',self.number_bar.font().pixelSize(), '--->'
+        # print 'number bar font size',self.number_bar.font().pixelSize(),
+        # '--->'
         self.number_bar.update()
 
-
     def write(self, text):
-        self.edit.insertPlainText(text)
+        # check regex
+
+        # regex = re.compile(regex_str)
+        if self.regex:
+            if self.regex.match(text):
+                self.edit.insertPlainText(text.strip()+'\n')
+        else:
+            self.edit.insertPlainText(text)
+
+        # self.edit.insertPlainText(text)
         self.update()
         self.edit.ensureCursorVisible()
 
@@ -291,7 +302,18 @@ class LogCat(QDialog):
         self.id = mo.MCommandMessage.addCommandOutputCallback(
             self.callback, None)
 
-        self.highlight=syntax.Highlighter(self.textedit.edit.document())
+        self.highlight = syntax.Highlighter(self.textedit.edit.document())
+
+        self.textedit.regex = None
+        self.lineedit.textChanged.connect(self.update_regex_str)
+
+    def update_regex_str(self):
+
+        regex_str = str(self.lineedit.text()).strip()
+        if regex_str:
+            self.textedit.regex = re.compile(regex_str)
+        else:
+            self.textedit.regex=None
 
     def callback(self, nativeMsg, messageType, data):
         # print nativeMsg, messageType, data

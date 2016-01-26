@@ -95,6 +95,7 @@ def highlightCmdReporter():
     mwin = getMayaWindowWidget()
     cmdReporters = cmds.lsUI(type='cmdScrollFieldReporter')
     if not cmdReporters: return
+    # print 'highlighting yeah:',cmdReporters[0]
     # only setup for the first one
     cmdReporter = mwin.findChild(QtGui.QTextEdit, cmdReporters[0])
     highlighter = Highlighter(parent=mwin)
